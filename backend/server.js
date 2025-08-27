@@ -12,7 +12,13 @@ const app = express();
 
 // Middleware
 app.use(express.json()); // parse JSON body
-app.use(cors());
+// allow frontend to talk to backend
+app.use(
+  cors({
+    origin: "http://localhost:5173", // React app URL
+    credentials: true,
+  })
+);
 
 // Connect Database
 connectDB();
