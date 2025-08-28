@@ -1,28 +1,26 @@
+// src/component/IncidentLogger.jsx
 import { useNavigate } from "react-router-dom";
 
 function IncidentLogger() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // ✅ Clear token
+    // Remove token
     localStorage.removeItem("token");
 
-    // ✅ Redirect back to login
+    // Redirect to login
     navigate("/login");
   };
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Incident Logger</h2>
-      </div>
+      <h1 className="text-2xl font-bold">Incident Logger</h1>
 
-      {/* Main content of Incident Logger */}
-      <p>Welcome! You can now log incidents here.</p>
+      {/* Your incident logging UI goes here */}
 
       <button
         onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded"
+        className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
       >
         Logout
       </button>

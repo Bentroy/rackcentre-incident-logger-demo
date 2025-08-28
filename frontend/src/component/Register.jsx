@@ -1,11 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
+import {useNavigate, Link} from "react-router-dom"; // 👈 Import Link
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +20,7 @@ function Register() {
       });
 
       setMessage(`✅ Registered! Welcome ${res.data.name}`);
+      navigate("/login");
     } catch (error) {
       setMessage(
         error.response?.data?.message || "❌ Something went wrong."
@@ -57,7 +60,16 @@ function Register() {
           Register
         </button>
       </form>
+
       {message && <p className="mt-3">{message}</p>}
+
+      {/* add login link */}
+      <p className="mt-4">
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-500">
+          Login
+        </Link>
+      </p>
     </div>
   );
 }

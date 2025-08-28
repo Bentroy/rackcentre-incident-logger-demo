@@ -3,6 +3,7 @@ import Login from "./component/Login";
 import Register from "./component/Register";
 import IncidentLogger from "./component/IncidentLogger";
 import ProtectedRoute from "./component/ProtectedRoute";
+import NotFound from "./component/NotFound"; // 👈 Import
 
 function App() {
   return (
@@ -12,13 +13,15 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/IncidentLogger"
+          path="/IncidentLogger"   // 👈 Keep exact casing here
           element={
             <ProtectedRoute>
               <IncidentLogger />
             </ProtectedRoute>
           }
         />
+        {/* 👇 Catch all unmatched routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
