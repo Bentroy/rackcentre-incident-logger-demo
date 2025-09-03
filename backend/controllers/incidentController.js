@@ -1,4 +1,17 @@
 const Incident = require("../models/Incident");
+const path = require("path");
+const fs = require("fs");
+
+// Get all Incidents
+exports.getIncidents = async (req, res) => {
+  try {
+    const incidents = await Incident.find().sort({ date: -1 });
+    res.json(incidents);
+  } catch (err) {
+    console.error("Error fetching incidents:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // Create Incident
 exports.createIncident = async (req, res) => {
@@ -10,7 +23,7 @@ exports.createIncident = async (req, res) => {
       type: req.body.type,
       impact: req.body.impact,
       file: req.file ? req.file.filename : null,
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(), // ✅ use readable ISO string
     });
 
     const saved = await incident.save();
@@ -30,7 +43,7 @@ exports.updateIncident = async (req, res) => {
       date: req.body.date,
       type: req.body.type,
       impact: req.body.impact,
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(),
     };
 
     if (req.file) {
@@ -50,6 +63,34 @@ exports.updateIncident = async (req, res) => {
     res.json(incident);
   } catch (err) {
     console.error("Error updating incident:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Delete Incident
+exports.deleteIncident = async (req, res) => {
+  try {
+    const incident = await Incident.findByIdAndDelete(req.params.id);
+
+    if (!incident) {
+      return res.status(404).json({ message: "Incident not found" });
+    }
+
+    // ✅ If incident has a file, delete it from uploads folder
+    if (incident.file) {
+      const filePath = path.join(__dirname, "../uploads", incident.file);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Failed to delete file:", err);
+        } else {
+          console.log("File deleted:", incident.file);
+        }
+      });
+    }
+
+    res.json({ message: "Incident deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting incident:", err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -3,8 +3,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const {
+  getIncidents,
   createIncident,
   updateIncident,
+  deleteIncident,
 } = require("../controllers/incidentController");
 
 const router = express.Router();
@@ -25,7 +27,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Routes
+router.get("/", getIncidents);
 router.post("/", upload.single("file"), createIncident);
 router.put("/:id", upload.single("file"), updateIncident);
+router.delete("/:id", deleteIncident);
 
 module.exports = router;

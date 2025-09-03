@@ -38,6 +38,17 @@ function Dashboard() {
     } else {
       navigate("/login");
     }
+
+    const fetchIncidents = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/incidents");
+        setIncidents(res.data);
+      } catch (error) {
+        console.error("Error fetching incidents:", error);
+      }
+    };
+
+    fetchIncidents();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -97,6 +108,7 @@ function Dashboard() {
         impact: "",
         file: null,
       });
+      document.getElementById("fileInput").value = "";
     } catch (error) {
       console.error("Error saving incident:", error);
     }
@@ -108,9 +120,17 @@ function Dashboard() {
     incidentsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleDelete = (index) => {
-    const updatedIncidents = incidents.filter((_, i) => i !== index);
-    setIncidents(updatedIncidents);
+  const handleDelete = async (index) => {
+    try {
+      const incidentId = incidents[index]._id; // ✅ Get the MongoDB ID
+      await axios.delete(`http://localhost:5000/api/incidents/${incidentId}`);
+
+      // ✅ Remove it from frontend state too
+      const updatedIncidents = incidents.filter((_, i) => i !== index);
+      setIncidents(updatedIncidents);
+    } catch (error) {
+      console.error("Error deleting incident:", error);
+    }
   };
 
   const impactColors = {
@@ -245,7 +265,10 @@ function Dashboard() {
           <input
             type="file"
             name="file"
-            onChange={handleChange}
+            id="fileInput"
+            onChange={(e) =>
+              setFormData({ ...formData, file: e.target.files[0] })
+            }
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
           />
 

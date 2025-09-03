@@ -5,6 +5,8 @@ import IncidentLogger from "./component/IncidentLogger";
 import ProtectedRoute from "./component/ProtectedRoute";
 import NotFound from "./component/NotFound"; // 👈 Import
 
+
+
 function App() {
   return (
     <Router>
