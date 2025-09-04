@@ -363,7 +363,7 @@ function Dashboard() {
         </div>
 
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
             <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-lg font-bold mb-4 text-white">
                 Confirm Delete
