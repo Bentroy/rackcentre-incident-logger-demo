@@ -16,6 +16,8 @@ function Dashboard() {
     timestamp: "",
   });
   const [editingIndex, setEditingIndex] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
   // pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,14 +122,16 @@ function Dashboard() {
     incidentsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleDelete = async (index) => {
+  const handleDelete = async () => {
     try {
-      const incidentId = incidents[index]._id; // ✅ Get the MongoDB ID
+      const incidentId = incidents[deleteIndex]._id;
       await axios.delete(`http://localhost:5000/api/incidents/${incidentId}`);
 
-      // ✅ Remove it from frontend state too
-      const updatedIncidents = incidents.filter((_, i) => i !== index);
+      const updatedIncidents = incidents.filter((_, i) => i !== deleteIndex);
       setIncidents(updatedIncidents);
+
+      setShowDeleteModal(false);
+      setDeleteIndex(null);
     } catch (error) {
       console.error("Error deleting incident:", error);
     }
@@ -325,7 +329,10 @@ function Dashboard() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(indexOfFirst + index)}
+                    onClick={() => {
+                      setDeleteIndex(indexOfFirst + index);
+                      setShowDeleteModal(true);
+                    }}
                     className="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition"
                   >
                     Delete
@@ -354,6 +361,33 @@ function Dashboard() {
             </div>
           )}
         </div>
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-10 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
+            <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center">
+              <h2 className="text-lg font-bold mb-4 text-white">
+                Confirm Delete
+              </h2>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to delete this incident?
+              </p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={handleDelete}
+                  className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
