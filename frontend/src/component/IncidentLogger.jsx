@@ -7,6 +7,7 @@ function Dashboard() {
   const [username, setUsername] = useState("");
   const [userProfile, setUserProfile] = useState(null);
   const [incidents, setIncidents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -21,6 +22,7 @@ function Dashboard() {
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,32 +37,29 @@ function Dashboard() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        
+        // Check if token is expired
+        if (decoded.exp * 1000 < Date.now()) {
+          console.log("Token expired");
+          handleLogout();
+          return;
+        }
+        
         setUsername(decoded.username || decoded.name || "User");
-
-        // Set authorization header for all axios requests
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        // Fetch user profile
+        
+        // ✅ Set authorization header for all axios requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        // Fetch user data
         fetchUserProfile();
+        fetchIncidents();
       } catch (error) {
         console.error("Invalid token:", error);
-        localStorage.removeItem("token");
-        navigate("/login");
+        handleLogout();
       }
     } else {
       navigate("/login");
     }
-
-    const fetchIncidents = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/incidents");
-        setIncidents(res.data);
-      } catch (error) {
-        console.error("Error fetching incidents:", error);
-      }
-    };
-
-    fetchIncidents();
   }, [navigate]);
 
   const fetchUserProfile = async () => {
@@ -69,6 +68,24 @@ function Dashboard() {
       setUserProfile(res.data);
     } catch (error) {
       console.error("Error fetching user profile:", error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
+    }
+  };
+
+  const fetchIncidents = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:5000/api/incidents");
+      setIncidents(res.data);
+    } catch (error) {
+      console.error("Error fetching incidents:", error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,15 +93,13 @@ function Dashboard() {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
       return;
     }
 
-    // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB");
+      alert('File size must be less than 5MB');
       return;
     }
 
@@ -92,21 +107,17 @@ function Dashboard() {
 
     try {
       const formData = new FormData();
-      formData.append("profilePic", file);
+      formData.append('profilePic', file);
 
-      const res = await axios.put(
-        "http://localhost:5000/api/users/profile-pic",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const res = await axios.put("http://localhost:5000/api/users/profile-pic", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
 
       setUserProfile(res.data.user);
       setShowProfileModal(false);
     } catch (error) {
       console.error("Error uploading profile picture:", error);
-      alert("Error uploading profile picture");
+      alert('Error uploading profile picture');
     } finally {
       setUploadingProfilePic(false);
     }
@@ -114,20 +125,18 @@ function Dashboard() {
 
   const handleRemoveProfilePic = async () => {
     try {
-      const res = await axios.delete(
-        "http://localhost:5000/api/users/profile-pic"
-      );
+      const res = await axios.delete("http://localhost:5000/api/users/profile-pic");
       setUserProfile(res.data.user);
       setShowProfileModal(false);
     } catch (error) {
       console.error("Error removing profile picture:", error);
-      alert("Error removing profile picture");
+      alert('Error removing profile picture');
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    delete axios.defaults.headers.common["Authorization"];
+    delete axios.defaults.headers.common['Authorization'];
     navigate("/login");
   };
 
@@ -141,6 +150,7 @@ function Dashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
     try {
       const data = new FormData();
@@ -171,7 +181,7 @@ function Dashboard() {
         res = await axios.post("http://localhost:5000/api/incidents", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setIncidents([...incidents, res.data]);
+        setIncidents([res.data, ...incidents]); // Add new incident to the beginning
       }
 
       // Reset form
@@ -186,12 +196,20 @@ function Dashboard() {
       document.getElementById("fileInput").value = "";
     } catch (error) {
       console.error("Error saving incident:", error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      } else {
+        alert("Error saving incident. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleEdit = (index) => {
-    setFormData(incidents[index]);
-    setEditingIndex(index);
+    const actualIndex = indexOfFirst + index;
+    setFormData(incidents[actualIndex]);
+    setEditingIndex(actualIndex);
     incidentsRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -205,8 +223,18 @@ function Dashboard() {
 
       setShowDeleteModal(false);
       setDeleteIndex(null);
+      
+      // Adjust current page if necessary
+      if (updatedIncidents.length <= (currentPage - 1) * incidentsPerPage && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (error) {
       console.error("Error deleting incident:", error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      } else {
+        alert("Error deleting incident. Please try again.");
+      }
     }
   };
 
@@ -234,14 +262,14 @@ function Dashboard() {
         {/* Profile Section */}
         <div className="flex flex-col items-center">
           {/* Profile Circle */}
-          <div
+          <div 
             className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold mb-3 shadow-md text-indigo-400 cursor-pointer hover:bg-gray-600 transition-colors overflow-hidden"
             onClick={() => setShowProfileModal(true)}
           >
             {userProfile?.profilePic ? (
-              <img
-                src={`http://localhost:5000${userProfile.profilePic}`}
-                alt="Profile"
+              <img 
+                src={`http://localhost:5000${userProfile.profilePic}`} 
+                alt="Profile" 
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -254,7 +282,12 @@ function Dashboard() {
             <p className="text-sm text-gray-300 font-medium">
               {userProfile?.name || username}
             </p>
-            <p className="text-xs text-gray-400">{userProfile?.email}</p>
+            <p className="text-xs text-gray-400">
+              {userProfile?.email}
+            </p>
+            <p className="text-xs text-indigo-400 mt-1">
+              {incidents.length} incident{incidents.length !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
 
@@ -264,7 +297,7 @@ function Dashboard() {
             onClick={scrollToIncidents}
             className="px-4 py-2 rounded-lg hover:bg-gray-800 hover:text-indigo-400 cursor-pointer transition-colors duration-200"
           >
-            📋 Logged Incidents
+            📋 My Incidents
           </li>
         </ul>
 
@@ -291,7 +324,7 @@ function Dashboard() {
       {/* Main Section */}
       <main className="flex-1 p-8 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
-          HSE Incident Log
+          My HSE Incident Log
           <span className="text-xs px-2 py-1 rounded-full bg-indigo-600 text-white font-semibold shadow">
             Beta
           </span>
@@ -367,26 +400,30 @@ function Dashboard() {
             onChange={(e) =>
               setFormData({ ...formData, file: e.target.files[0] })
             }
-            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt"
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
           />
 
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition w-full"
+            disabled={submitting}
+            className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition w-full disabled:opacity-50"
           >
-            {editingIndex !== null ? "Update Incident" : "Submit Incident"}
+            {submitting 
+              ? "Saving..." 
+              : (editingIndex !== null ? "Update Incident" : "Submit Incident")
+            }
           </button>
         </form>
 
         {/* List */}
         <div ref={incidentsRef} className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Logged Incidents</h2>
-          {incidents.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">
-              No incidents logged yet. Start by adding your first incident
-              above.
-            </p>
+          <h2 className="text-xl font-semibold mb-4">My Logged Incidents</h2>
+          
+          {loading ? (
+            <p className="text-gray-400 text-center py-8">Loading your incidents...</p>
+          ) : incidents.length === 0 ? (
+            <p className="text-gray-400 text-center py-8">You haven't logged any incidents yet. Start by adding your first incident above.</p>
           ) : (
             <ul className="space-y-4">
               {currentIncidents.map((incident, index) => (
@@ -395,41 +432,43 @@ function Dashboard() {
                   className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-xl transition"
                 >
                   <h3 className="text-lg font-bold">{incident.title}</h3>
-                  <p className="text-sm">{incident.description}</p>
-                  <p className="text-xs text-gray-400">
-                    📅 {new Date(incident.date).toLocaleDateString()}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    ⏰ {new Date(incident.timestamp).toLocaleString()}
-                  </p>
+                  <p className="text-sm text-gray-300 mt-1">{incident.description}</p>
+                  <div className="flex flex-wrap gap-4 text-xs text-gray-400 mt-2">
+                    <p>📅 {new Date(incident.date).toLocaleDateString()}</p>
+                    <p>⏰ {new Date(incident.createdAt || incident.timestamp).toLocaleString()}</p>
+                  </div>
+                  
                   {incident.file && (
                     <a
                       href={`http://localhost:5000${incident.file}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm"
+                      className="text-blue-400 hover:text-blue-300 text-sm block mt-2"
                     >
-                      🔎 View File
+                      🔎 View Attachment
                     </a>
                   )}
-                  <br />
-                  {incident.type && (
-                    <span className="inline-block bg-blue-600 px-2 py-1 text-xs rounded-lg mt-1">
-                      {incident.type}
-                    </span>
-                  )}
-                  {incident.impact && (
-                    <span
-                      className={`inline-block ${
-                        impactColors[incident.impact]
-                      } px-2 py-1 text-xs rounded-lg mt-1 ml-2`}
-                    >
-                      {incident.impact}
-                    </span>
-                  )}
+                  
+                  <div className="flex items-center gap-2 mt-3">
+                    {incident.type && (
+                      <span className="inline-block bg-blue-600 px-2 py-1 text-xs rounded-lg">
+                        {incident.type}
+                      </span>
+                    )}
+                    {incident.impact && (
+                      <span
+                        className={`inline-block ${
+                          impactColors[incident.impact]
+                        } px-2 py-1 text-xs rounded-lg text-white`}
+                      >
+                        {incident.impact}
+                      </span>
+                    )}
+                  </div>
+                  
                   <div className="mt-3 space-x-2">
                     <button
-                      onClick={() => handleEdit(indexOfFirst + index)}
+                      onClick={() => handleEdit(index)}
                       className="bg-yellow-600 px-3 py-1 rounded hover:bg-yellow-700 transition text-sm"
                     >
                       Edit
@@ -476,14 +515,14 @@ function Dashboard() {
               <h2 className="text-lg font-bold mb-4 text-white">
                 Profile Picture
               </h2>
-
+              
               {/* Current Profile Picture */}
               <div className="mb-4">
                 <div className="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold mx-auto shadow-md text-indigo-400 overflow-hidden">
                   {userProfile?.profilePic ? (
-                    <img
-                      src={`http://localhost:5000${userProfile.profilePic}`}
-                      alt="Profile"
+                    <img 
+                      src={`http://localhost:5000${userProfile.profilePic}`} 
+                      alt="Profile" 
                       className="w-full h-full object-cover"
                     />
                   ) : (
