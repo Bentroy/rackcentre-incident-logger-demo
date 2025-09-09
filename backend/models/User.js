@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please add a password"],
       minlength: 6,
     },
+    profilePic: {
+      type: String,
+      default: null, // ✅ Add profile picture field
+    },
   },
   {
     timestamps: true, // auto adds createdAt & updatedAt

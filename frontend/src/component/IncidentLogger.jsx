@@ -5,6 +5,7 @@ import axios from "axios";
 
 function Dashboard() {
   const [username, setUsername] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
   const [incidents, setIncidents] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
@@ -18,6 +19,8 @@ function Dashboard() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
 
   // pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,13 +28,20 @@ function Dashboard() {
 
   const navigate = useNavigate();
   const incidentsRef = useRef(null);
+  const profilePicInputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUsername(decoded.username || "User");
+        setUsername(decoded.username || decoded.name || "User");
+
+        // Set authorization header for all axios requests
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        // Fetch user profile
+        fetchUserProfile();
       } catch (error) {
         console.error("Invalid token:", error);
         localStorage.removeItem("token");
@@ -53,8 +63,71 @@ function Dashboard() {
     fetchIncidents();
   }, [navigate]);
 
+  const fetchUserProfile = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/users/profile");
+      setUserProfile(res.data);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
+  const handleProfilePicUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5MB");
+      return;
+    }
+
+    setUploadingProfilePic(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("profilePic", file);
+
+      const res = await axios.put(
+        "http://localhost:5000/api/users/profile-pic",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      setUserProfile(res.data.user);
+      setShowProfileModal(false);
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("Error uploading profile picture");
+    } finally {
+      setUploadingProfilePic(false);
+    }
+  };
+
+  const handleRemoveProfilePic = async () => {
+    try {
+      const res = await axios.delete(
+        "http://localhost:5000/api/users/profile-pic"
+      );
+      setUserProfile(res.data.user);
+      setShowProfileModal(false);
+    } catch (error) {
+      console.error("Error removing profile picture:", error);
+      alert("Error removing profile picture");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
+    delete axios.defaults.headers.common["Authorization"];
     navigate("/login");
   };
 
@@ -161,14 +234,28 @@ function Dashboard() {
         {/* Profile Section */}
         <div className="flex flex-col items-center">
           {/* Profile Circle */}
-          <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold mb-3 shadow-md text-indigo-400">
-            {username?.[0]?.toUpperCase() || "U"}
+          <div
+            className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold mb-3 shadow-md text-indigo-400 cursor-pointer hover:bg-gray-600 transition-colors overflow-hidden"
+            onClick={() => setShowProfileModal(true)}
+          >
+            {userProfile?.profilePic ? (
+              <img
+                src={`http://localhost:5000${userProfile.profilePic}`}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              username?.[0]?.toUpperCase() || "U"
+            )}
           </div>
 
-          {/* Profile Button */}
-          <button className="w-full border border-gray-600 text-sm text-gray-300 py-2 rounded-lg mb-6 hover:border-indigo-500 hover:text-indigo-400 transition-colors duration-200">
-            Profile
-          </button>
+          {/* User Name Display */}
+          <div className="text-center mb-6">
+            <p className="text-sm text-gray-300 font-medium">
+              {userProfile?.name || username}
+            </p>
+            <p className="text-xs text-gray-400">{userProfile?.email}</p>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -222,6 +309,7 @@ function Dashboard() {
             onChange={handleChange}
             placeholder="Incident Title"
             className="w-full h-12 p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition transform hover:scale-[1.01] hover:shadow-lg"
+            required
           />
 
           <select
@@ -229,11 +317,14 @@ function Dashboard() {
             value={formData.type}
             onChange={handleChange}
             className="w-full h-12 p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 transition transform hover:scale-[1.01] hover:shadow-lg"
+            required
           >
             <option value="">Select Type</option>
             <option value="Injury">Injury</option>
             <option value="Near Miss">Near Miss</option>
             <option value="Hazard">Hazard</option>
+            <option value="Environmental">Environmental</option>
+            <option value="Equipment Failure">Equipment Failure</option>
           </select>
 
           <select
@@ -241,6 +332,7 @@ function Dashboard() {
             value={formData.impact}
             onChange={handleChange}
             className="w-full h-12 p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 transition transform hover:scale-[1.01] hover:shadow-lg"
+            required
           >
             <option value="">Select Impact</option>
             <option value="Low">Low</option>
@@ -256,6 +348,7 @@ function Dashboard() {
             rows="4"
             placeholder="Brief description of incident"
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition transform hover:scale-[1.01] hover:shadow-lg"
+            required
           ></textarea>
 
           <input
@@ -264,6 +357,7 @@ function Dashboard() {
             value={formData.date}
             onChange={handleChange}
             className="w-full h-12 p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 transition transform hover:scale-[1.01] hover:shadow-lg"
+            required
           />
 
           <input
@@ -273,6 +367,7 @@ function Dashboard() {
             onChange={(e) =>
               setFormData({ ...formData, file: e.target.files[0] })
             }
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
           />
 
@@ -287,60 +382,72 @@ function Dashboard() {
         {/* List */}
         <div ref={incidentsRef} className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Logged Incidents</h2>
-          <ul className="space-y-4">
-            {currentIncidents.map((incident, index) => (
-              <li
-                key={index}
-                className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-xl transition"
-              >
-                <h3 className="text-lg font-bold">{incident.title}</h3>
-                <p className="text-sm">{incident.description}</p>
-                <p className="text-xs text-gray-400">📅 {incident.date}</p>
-                <p className="text-xs text-gray-400">⏰ {incident.timestamp}</p>
-                {incident.file && (
-                  <a
-                    href={`http://localhost:5000${incident.file}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    📎 View File
-                  </a>
-                )}
-                <br />
-                {incident.type && (
-                  <span className="inline-block bg-blue-600 px-2 py-1 text-xs rounded-lg mt-1">
-                    {incident.type}
-                  </span>
-                )}
-                {incident.impact && (
-                  <span
-                    className={`inline-block ${
-                      impactColors[incident.impact]
-                    } px-2 py-1 text-xs rounded-lg mt-1 ml-2`}
-                  >
-                    {incident.impact}
-                  </span>
-                )}
-                <div className="mt-3 space-x-2">
-                  <button
-                    onClick={() => handleEdit(indexOfFirst + index)}
-                    className="bg-yellow-600 px-3 py-1 rounded hover:bg-yellow-700 transition"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setDeleteIndex(indexOfFirst + index);
-                      setShowDeleteModal(true);
-                    }}
-                    className="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {incidents.length === 0 ? (
+            <p className="text-gray-400 text-center py-8">
+              No incidents logged yet. Start by adding your first incident
+              above.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {currentIncidents.map((incident, index) => (
+                <li
+                  key={incident._id || index}
+                  className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-xl transition"
+                >
+                  <h3 className="text-lg font-bold">{incident.title}</h3>
+                  <p className="text-sm">{incident.description}</p>
+                  <p className="text-xs text-gray-400">
+                    📅 {new Date(incident.date).toLocaleDateString()}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    ⏰ {new Date(incident.timestamp).toLocaleString()}
+                  </p>
+                  {incident.file && (
+                    <a
+                      href={`http://localhost:5000${incident.file}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 text-sm"
+                    >
+                      🔎 View File
+                    </a>
+                  )}
+                  <br />
+                  {incident.type && (
+                    <span className="inline-block bg-blue-600 px-2 py-1 text-xs rounded-lg mt-1">
+                      {incident.type}
+                    </span>
+                  )}
+                  {incident.impact && (
+                    <span
+                      className={`inline-block ${
+                        impactColors[incident.impact]
+                      } px-2 py-1 text-xs rounded-lg mt-1 ml-2`}
+                    >
+                      {incident.impact}
+                    </span>
+                  )}
+                  <div className="mt-3 space-x-2">
+                    <button
+                      onClick={() => handleEdit(indexOfFirst + index)}
+                      className="bg-yellow-600 px-3 py-1 rounded hover:bg-yellow-700 transition text-sm"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeleteIndex(indexOfFirst + index);
+                        setShowDeleteModal(true);
+                      }}
+                      className="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -362,6 +469,75 @@ function Dashboard() {
           )}
         </div>
 
+        {/* Profile Modal */}
+        {showProfileModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
+            <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center max-w-md w-full mx-4">
+              <h2 className="text-lg font-bold mb-4 text-white">
+                Profile Picture
+              </h2>
+
+              {/* Current Profile Picture */}
+              <div className="mb-4">
+                <div className="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold mx-auto shadow-md text-indigo-400 overflow-hidden">
+                  {userProfile?.profilePic ? (
+                    <img
+                      src={`http://localhost:5000${userProfile.profilePic}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    username?.[0]?.toUpperCase() || "U"
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {/* Upload Button */}
+                <button
+                  onClick={() => profilePicInputRef.current?.click()}
+                  disabled={uploadingProfilePic}
+                  className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition w-full disabled:opacity-50"
+                >
+                  {uploadingProfilePic ? "Uploading..." : "Change Picture"}
+                </button>
+
+                {/* Remove Button (only show if user has profile pic) */}
+                {userProfile?.profilePic && (
+                  <button
+                    onClick={handleRemoveProfilePic}
+                    className="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition w-full"
+                  >
+                    Remove Picture
+                  </button>
+                )}
+
+                {/* Cancel Button */}
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700 transition w-full"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              {/* Hidden File Input */}
+              <input
+                ref={profilePicInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicUpload}
+                className="hidden"
+              />
+
+              <p className="text-xs text-gray-400 mt-3">
+                Supported: JPG, PNG. Max size: 5MB
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
             <div className="bg-gray-900 p-6 rounded-lg shadow-lg text-center">

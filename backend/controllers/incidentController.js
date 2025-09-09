@@ -22,8 +22,8 @@ exports.createIncident = async (req, res) => {
       date: req.body.date,
       type: req.body.type,
       impact: req.body.impact,
-      file: req.file ? req.file.filename : null,
-      timestamp: new Date().toISOString(), // ✅ use readable ISO string
+      file: req.file ? `/uploads/${req.file.filename}` : null, // ✅ Full path with /uploads/
+      timestamp: new Date().toISOString(),
     });
 
     const saved = await incident.save();
@@ -47,7 +47,7 @@ exports.updateIncident = async (req, res) => {
     };
 
     if (req.file) {
-      updateData.file = req.file.filename;
+      updateData.file = `/uploads/${req.file.filename}`; // ✅ Full path with /uploads/
     }
 
     const incident = await Incident.findByIdAndUpdate(
@@ -78,12 +78,15 @@ exports.deleteIncident = async (req, res) => {
 
     // ✅ If incident has a file, delete it from uploads folder
     if (incident.file) {
-      const filePath = path.join(__dirname, "../uploads", incident.file);
+      // Remove /uploads/ prefix to get just filename
+      const filename = incident.file.replace('/uploads/', '');
+      const filePath = path.join(__dirname, "../uploads", filename);
+      
       fs.unlink(filePath, (err) => {
         if (err) {
           console.error("Failed to delete file:", err);
         } else {
-          console.log("File deleted:", incident.file);
+          console.log("File deleted:", filename);
         }
       });
     }

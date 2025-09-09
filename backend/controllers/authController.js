@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
+        token: generateToken(user.id, user.name), // ✅ Include name in token
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -63,7 +63,11 @@ const loginUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
+        token: generateToken(user.id, user.name), // ✅ Include name in token
+        user: { // ✅ Return user object for frontend
+          name: user.name,
+          email: user.email
+        }
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
@@ -74,9 +78,12 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+// ✅ Generate JWT with user ID and username
+const generateToken = (id, username) => {
+  return jwt.sign({ 
+    id, 
+    username 
+  }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
 };
