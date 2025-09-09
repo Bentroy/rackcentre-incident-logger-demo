@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -60,6 +61,7 @@ function Dashboard() {
     } else {
       navigate("/login");
     }
+    //
   }, [navigate]);
 
   const fetchUserProfile = async () => {

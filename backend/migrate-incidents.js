@@ -12,11 +12,8 @@ dotenv.config();
 
 const migrateIncidents = async () => {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // ✅ Connect to MongoDB (removed deprecated options)
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
     // Find all incidents without user association
@@ -54,17 +51,6 @@ const migrateIncidents = async () => {
 
     console.log(`✅ Successfully updated ${result.modifiedCount} incidents`);
 
-    // Alternative: If you want to prompt which user to associate with
-    // You can list all users and let admin choose
-    /*
-    const allUsers = await User.find().select('name email');
-    console.log("Available users:");
-    allUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.name} (${user.email})`);
-    });
-    // You would then prompt for input and use the selected user
-    */
-
   } catch (error) {
     console.error("❌ Migration failed:", error);
   } finally {
@@ -76,10 +62,8 @@ const migrateIncidents = async () => {
 // Enhanced migration that can handle multiple users
 const enhancedMigration = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // ✅ Remove deprecated options
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
     const incidentsWithoutUser = await Incident.find({ user: { $exists: false } });
@@ -101,7 +85,7 @@ const enhancedMigration = async () => {
     if (allUsers.length === 1) {
       // If only one user, assign all incidents to them
       const user = allUsers[0];
-      await Incident.updateMany(
+      const result = await Incident.updateMany(
         { user: { $exists: false } },
         {
           $set: {
@@ -113,13 +97,12 @@ const enhancedMigration = async () => {
           }
         }
       );
-      console.log(`✅ Assigned all incidents to ${user.name}`);
+      console.log(`✅ Assigned ${result.modifiedCount} incidents to ${user.name}`);
     } else {
-      // If multiple users, you might want to:
-      // 1. Assign to the oldest user (first registered)
+      // If multiple users, assign to the oldest user (first registered)
       const oldestUser = allUsers.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
       
-      await Incident.updateMany(
+      const result = await Incident.updateMany(
         { user: { $exists: false } },
         {
           $set: {
@@ -131,28 +114,20 @@ const enhancedMigration = async () => {
           }
         }
       );
-      console.log(`✅ Assigned all incidents to oldest user: ${oldestUser.name}`);
-
-      // 2. Alternative: Distribute incidents evenly (uncomment if preferred)
-      /*
-      for (let i = 0; i < incidentsWithoutUser.length; i++) {
-        const userIndex = i % allUsers.length;
-        const assignedUser = allUsers[userIndex];
-        
-        await Incident.findByIdAndUpdate(incidentsWithoutUser[i]._id, {
-          user: assignedUser._id,
-          userInfo: {
-            name: assignedUser.name,
-            email: assignedUser.email
-          }
-        });
-      }
-      console.log("✅ Distributed incidents evenly among all users");
-      */
+      console.log(`✅ Assigned ${result.modifiedCount} incidents to oldest user: ${oldestUser.name}`);
     }
 
   } catch (error) {
     console.error("❌ Enhanced migration failed:", error);
+    
+    // ✅ More helpful error messages
+    if (error.code === 'ECONNREFUSED') {
+      console.log("\n🔍 Connection troubleshooting:");
+      console.log("1. Check if your MongoDB URI is correct in .env file");
+      console.log("2. Verify your internet connection");
+      console.log("3. Make sure your MongoDB cluster is running");
+      console.log("4. Check if your IP address is whitelisted in MongoDB Atlas");
+    }
   } finally {
     await mongoose.connection.close();
   }
