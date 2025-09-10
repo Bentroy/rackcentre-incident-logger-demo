@@ -16,7 +16,6 @@ function Dashboard() {
     type: "",
     impact: "",
     file: null,
-    timestamp: "",
   });
   const [editingIndex, setEditingIndex] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -33,7 +32,7 @@ function Dashboard() {
   const incidentsRef = useRef(null);
   const profilePicInputRef = useRef(null);
 
-  // ✅ Memoized functions
+  // ✅ Real functions with your actual API calls
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     delete axios.defaults.headers.common['Authorization'];
@@ -266,31 +265,37 @@ function Dashboard() {
         {/* Collapse Button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-8 w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full shadow-lg flex items-center justify-center text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-110 z-10"
+          className="absolute -right-4 top-6 w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full shadow-xl flex items-center justify-center text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-110 z-10 border-2 border-slate-700"
         >
-          <span className={`transform transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''} text-xs font-bold`}>
-            {sidebarCollapsed ? '→' : '←'}
-          </span>
+          {sidebarCollapsed ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M11 19l-7-7 7-7" />
+            </svg>
+          )}
         </button>
 
-        <div className="p-6 flex-1">
+        <div className={`p-6 flex-1 ${sidebarCollapsed ? 'px-2 py-4' : ''}`}>
           {/* Profile Section */}
-          <div className={`flex flex-col items-center transition-all duration-500 ${sidebarCollapsed ? 'scale-75' : ''}`}>
+          <div className={`flex flex-col items-center transition-all duration-500 ${sidebarCollapsed ? 'scale-90 mb-4' : 'mb-6'}`}>
             {/* Profile Circle */}
             <div 
               className="relative group cursor-pointer"
               onClick={() => !sidebarCollapsed && setShowProfileModal(true)}
             >
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <div className={`${sidebarCollapsed ? 'w-12 h-12' : 'w-20 h-20'} rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-0.5 shadow-xl hover:shadow-2xl transition-all duration-300`}>
                 <div className="w-full h-full rounded-2xl bg-slate-800 flex items-center justify-center text-2xl font-bold overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img 
-                      src={`http://localhost:5000${userProfile.profilePic}`} 
+                      src={userProfile.profilePic} 
                       alt="Profile" 
                       className="w-full h-full object-cover rounded-2xl"
                     />
                   ) : (
-                    <span className="bg-gradient-to-br from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    <span className={`bg-gradient-to-br from-indigo-400 to-purple-400 bg-clip-text text-transparent ${sidebarCollapsed ? 'text-lg' : 'text-2xl'}`}>
                       {username?.[0]?.toUpperCase() || "U"}
                     </span>
                   )}
@@ -321,14 +326,14 @@ function Dashboard() {
           </div>
 
           {/* Navigation */}
-          <div className={`mt-8 space-y-2 ${sidebarCollapsed ? 'mt-4' : ''}`}>
+          <div className={`space-y-2 ${sidebarCollapsed ? 'mt-2' : 'mt-8'}`}>
             <button
               onClick={scrollToIncidents}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'} rounded-xl text-left hover:bg-slate-700/50 transition-all duration-300 group hover:scale-105 bg-slate-800/50 border border-slate-700/30`}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-1 py-2' : 'px-4 py-3'} rounded-xl text-left hover:bg-slate-700/50 transition-all duration-300 group hover:scale-105 bg-slate-800/50 border border-slate-700/30`}
             >
-              <span className="text-xl mr-3 group-hover:scale-110 transition-transform duration-300">📊</span>
+              <span className={`${sidebarCollapsed ? 'text-lg' : 'text-xl'} group-hover:scale-110 transition-transform duration-300`}>📊</span>
               {!sidebarCollapsed && (
-                <div>
+                <div className="ml-3">
                   <div className="font-medium text-gray-200">My Incidents</div>
                   <div className="text-xs text-gray-500">View & manage reports</div>
                 </div>
@@ -336,14 +341,14 @@ function Dashboard() {
             </button>
 
             <button
-              onClick={() => navigate("/admin")}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'} rounded-xl text-left hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20 transition-all duration-300 group hover:scale-105 border border-transparent hover:border-indigo-500/30`}
+              onClick={() => fetchIncidents()}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-1 py-2' : 'px-4 py-3'} rounded-xl text-left hover:bg-gradient-to-r hover:from-emerald-600/20 hover:to-teal-600/20 transition-all duration-300 group hover:scale-105 border border-transparent hover:border-emerald-500/30`}
             >
-              <span className="text-xl mr-3 group-hover:scale-110 transition-transform duration-300">👑</span>
+              <span className={`${sidebarCollapsed ? 'text-lg' : 'text-xl'} group-hover:scale-110 transition-transform duration-300`}>🔄</span>
               {!sidebarCollapsed && (
-                <div>
-                  <div className="font-medium text-gray-200">Admin Panel</div>
-                  <div className="text-xs text-gray-500">System overview</div>
+                <div className="ml-3">
+                  <div className="font-medium text-gray-200">Refresh Data</div>
+                  <div className="text-xs text-gray-500">Update incidents list</div>
                 </div>
               )}
             </button>
@@ -351,7 +356,7 @@ function Dashboard() {
         </div>
 
         {/* Bottom Section */}
-        <div className="p-6 space-y-4 border-t border-slate-700/30">
+        <div className={`space-y-4 border-t border-slate-700/30 ${sidebarCollapsed ? 'p-2' : 'p-6'}`}>
           {!sidebarCollapsed && (
             <div className="text-center">
               <div className="flex items-center justify-between text-gray-400 text-sm mb-2">
@@ -365,10 +370,10 @@ function Dashboard() {
 
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'} rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-1 py-2' : 'px-4 py-3'} rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25`}
           >
-            <span className="text-xl mr-3">🚪</span>
-            {!sidebarCollapsed && <span className="font-medium">Logout</span>}
+            <span className={`${sidebarCollapsed ? 'text-lg' : 'text-xl'}`}>🚪</span>
+            {!sidebarCollapsed && <span className="font-medium ml-3">Logout</span>}
           </button>
         </div>
       </aside>
@@ -561,15 +566,10 @@ function Dashboard() {
                         </div>
 
                         {incident.file && (
-                          <a
-                            href={`http://localhost:5000${incident.file}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors duration-300 mb-4"
-                          >
+                          <div className="inline-flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors duration-300 mb-4 cursor-pointer">
                             <span>📎</span>
                             <span className="underline">View Attachment</span>
-                          </a>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -658,7 +658,7 @@ function Dashboard() {
                 <div className="w-full h-full rounded-2xl bg-slate-800 flex items-center justify-center text-4xl font-bold overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img 
-                      src={`http://localhost:5000${userProfile.profilePic}`} 
+                      src={userProfile.profilePic} 
                       alt="Profile" 
                       className="w-full h-full object-cover rounded-2xl"
                     />
