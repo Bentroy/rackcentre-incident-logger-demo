@@ -101,7 +101,6 @@ function Dashboard() {
       return;
     }
 
-    // ✅ Reduced to 1.5MB
     if (file.size > 1.5 * 1024 * 1024) {
       alert("File size must be less than 1.5MB");
       return;
@@ -269,9 +268,11 @@ function Dashboard() {
   const totalPages = Math.ceil(incidents.length / incidentsPerPage);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 overflow-hidden">
+    // ✅ Changed: Main background to light gray
+    <div className="flex h-screen bg-gray-100 text-gray-800 overflow-hidden">
       {/* ✨ Enhanced Collapsible Sidebar */}
-      <aside className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 ease-in-out bg-dark shadow-xl border-r border-gray-200 flex flex-col relative`}>
+      {/* ✅ Changed: Sidebar background to white */}
+      <aside className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 ease-in-out bg-white shadow-lg border-r border-gray-200 flex flex-col relative`}>
         {/* Collapse Button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -290,7 +291,8 @@ function Dashboard() {
 
         {/* Header Section */}
         {!sidebarCollapsed && (
-          <div className="p-6 border-b border-gray-100">
+          // ✅ Changed: Border and text colors
+          <div className="p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,8 +300,8 @@ function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-100">HSE Logger</h1>
-                <p className="text-xs text-gray-200">Incident Management</p>
+                <h1 className="text-lg font-bold text-gray-900">HSE Logger</h1>
+                <p className="text-xs text-gray-500">Incident Management</p>
               </div>
             </div>
           </div>
@@ -313,7 +315,8 @@ function Dashboard() {
               onClick={() => !sidebarCollapsed && setShowProfileModal(true)}
             >
               <div className={`${sidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5 shadow-lg hover:shadow-xl transition-all duration-200`}>
-                <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                {/* ✅ Changed: Inner background to light gray for contrast */}
+                <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img 
                       src={`http://localhost:5000${userProfile.profilePic}`} 
@@ -328,6 +331,7 @@ function Dashboard() {
                 </div>
               </div>
               {!sidebarCollapsed && (
+                // ✅ Changed: Border color to match new background
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white">
                   <div className="w-full h-full rounded-full bg-green-500 flex items-center justify-center">
                     <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -339,12 +343,13 @@ function Dashboard() {
             </div>
 
             {!sidebarCollapsed && (
+              // ✅ Changed: Text colors for light background
               <div className="text-center mt-3">
-                <h3 className="font-semibold text-gray-200">
+                <h3 className="font-semibold text-gray-800">
                   {userProfile?.name || username}
                 </h3>
-                <p className="text-sm text-gray-400 mb-2">{userProfile?.email}</p>
-                <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                <p className="text-sm text-gray-500 mb-2">{userProfile?.email}</p>
+                <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
                   {incidents.length} Reports
                 </div>
@@ -356,9 +361,10 @@ function Dashboard() {
         {/* Navigation Menu */}
         <div className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-6'}`}>
           <nav className="space-y-2">
+            {/* ✅ Changed: Text colors for light mode */}
             <button
               onClick={scrollToIncidents}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 group text-gray-700 font-medium`}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200 group text-gray-600 font-medium`}
             >
               <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'} group-hover:scale-110 transition-transform duration-200`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -373,7 +379,7 @@ function Dashboard() {
 
             <button
               onClick={() => fetchIncidents()}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-green-50 hover:text-green-700 transition-colors duration-200 group text-gray-700 font-medium`}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-200 group text-gray-600 font-medium`}
             >
               <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'} group-hover:rotate-180 transition-transform duration-300`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -389,7 +395,8 @@ function Dashboard() {
         </div>
 
         {/* Bottom Section */}
-        <div className={`border-t border-gray-100 ${sidebarCollapsed ? 'p-2' : 'p-6'} space-y-4`}>
+        {/* ✅ Changed: Border color */}
+        <div className={`border-t border-gray-200 ${sidebarCollapsed ? 'p-2' : 'p-6'} space-y-4`}>
           {!sidebarCollapsed && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500 font-medium">HSE Incident Logger</span>
@@ -401,7 +408,7 @@ function Dashboard() {
 
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 transition-colors duration-200 font-medium`}
+            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 transition-colors duration-200 font-medium`}
           >
             <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -414,17 +421,18 @@ function Dashboard() {
       {/* ✨ Enhanced Main Content */}
       <main className="flex-1 overflow-hidden flex flex-col">
         {/* Header */}
-        <header className="bg-slate-800/50 backdrop-blur-xl border-b border-slate-700/30 p-6">
+        {/* ✅ Changed: Header background, border, and text colors */}
+        <header className="bg-white/80 backdrop-blur-xl border-b border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-indigo-700 to-indigo-500 bg-clip-text text-transparent">
                 HSE Incident Logger
               </h1>
-              <p className="text-gray-400 mt-1">Personal incident tracking & reporting</p>
+              <p className="text-gray-500 mt-1">Personal incident tracking & reporting</p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="px-4 py-2 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30">
-                <span className="text-sm text-gray-300">Welcome back, <span className="font-semibold text-white">{username}</span></span>
+              <div className="px-4 py-2 bg-gray-100 rounded-xl border border-gray-200">
+                <span className="text-sm text-gray-600">Welcome back, <span className="font-semibold text-slate-800">{username}</span></span>
               </div>
             </div>
           </div>
@@ -432,15 +440,17 @@ function Dashboard() {
 
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {/* ✨ Enhanced Form */}
+          {/* ✅ Changed: Form background and border */}
           <form
             onSubmit={handleSubmit}
-            className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-slate-700/30 space-y-6 hover:shadow-3xl transition-all duration-500"
+            className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200/80 space-y-6 hover:shadow-2xl transition-all duration-500"
           >
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <span className="text-xl">📝</span>
               </div>
-              <h2 className="text-2xl font-bold text-white">
+              {/* ✅ Changed: Text color */}
+              <h2 className="text-2xl font-bold text-slate-900">
                 {editingIndex !== null
                   ? "Update Incident"
                   : "Report New Incident"}
@@ -448,13 +458,14 @@ function Dashboard() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
+              {/* ✅ Changed: Input field styles */}
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Incident Title"
-                className="col-span-full h-14 p-4 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300 hover:bg-slate-700/70 backdrop-blur-sm"
+                className="col-span-full h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 transition-all duration-300 hover:bg-gray-100"
                 required
               />
 
@@ -462,7 +473,7 @@ function Dashboard() {
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="h-14 p-4 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-slate-700/70"
+                className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
                 required
               >
                 <option value="">Select Incident Type</option>
@@ -477,7 +488,7 @@ function Dashboard() {
                 name="impact"
                 value={formData.impact}
                 onChange={handleChange}
-                className="h-14 p-4 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-slate-700/70"
+                className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
                 required
               >
                 <option value="">Select Impact Level</option>
@@ -494,7 +505,7 @@ function Dashboard() {
               onChange={handleChange}
               rows="4"
               placeholder="Detailed description of the incident..."
-              className="w-full p-4 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300 hover:bg-slate-700/70 resize-none"
+              className="w-full p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 transition-all duration-300 hover:bg-gray-100 resize-none"
               required
             />
 
@@ -504,11 +515,11 @@ function Dashboard() {
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="h-14 p-4 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-slate-700/70"
+                className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
                 required
               />
-
-              {/* ✅ Fixed file input - positioned to left with padding */}
+              
+              {/* ✅ Changed: File input background */}
               <div className="relative">
                 <input
                   type="file"
@@ -518,7 +529,7 @@ function Dashboard() {
                     setFormData({ ...formData, file: e.target.files[0] })
                   }
                   accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt"
-                  className="w-full h-14 bg-slate-700/50 border border-slate-600/50 rounded-xl transition-all duration-300 hover:bg-slate-700/70 text-transparent
+                  className="w-full h-14 bg-gray-50 border border-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 text-transparent
                     file:absolute file:left-4 file:top-1/2 file:-translate-y-1/2
                     file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold 
                     file:bg-gradient-to-r file:from-indigo-500 file:to-purple-600 file:text-white 
@@ -531,7 +542,7 @@ function Dashboard() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/25 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/25 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {submitting ? (
                 <>
@@ -555,11 +566,13 @@ function Dashboard() {
           {/* ✨ Enhanced Incidents List */}
           <div ref={incidentsRef} className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              {/* ✅ Changed: Text gradient */}
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-gray-700 bg-clip-text text-transparent">
                 My Incident Reports
               </h2>
               <div className="flex items-center space-x-3">
-                <div className="px-3 py-1 bg-slate-700/50 rounded-full text-sm text-gray-300">
+                {/* ✅ Changed: Badge styles */}
+                <div className="px-3 py-1 bg-gray-200 rounded-full text-sm text-gray-700">
                   {incidents.length} total incidents
                 </div>
               </div>
@@ -569,15 +582,17 @@ function Dashboard() {
               <div className="flex items-center justify-center py-20">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-                  <span className="text-gray-400">
+                  {/* ✅ Changed: Text color */}
+                  <span className="text-gray-600">
                     Loading your incidents...
                   </span>
                 </div>
               </div>
             ) : incidents.length === 0 ? (
-              <div className="text-center py-20 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/30">
+              // ✅ Changed: Empty state background and text colors
+              <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-gray-200/80">
                 <div className="text-6xl mb-4 opacity-50">📋</div>
-                <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
                   No incidents reported yet
                 </h3>
                 <p className="text-gray-500">
@@ -587,9 +602,10 @@ function Dashboard() {
             ) : (
               <div className="grid gap-6">
                 {currentIncidents.map((incident, index) => (
+                  // ✅ Changed: Card background and border
                   <div
                     key={incident._id || index}
-                    className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-slate-700/30 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 group"
+                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200/80 hover:shadow-xl hover:scale-[1.01] transition-all duration-500 group"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
@@ -597,15 +613,16 @@ function Dashboard() {
                           <span className="text-2xl">
                             {typeIcons[incident.type] || "📝"}
                           </span>
-                          <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors duration-300">
+                           {/* ✅ Changed: Text colors */}
+                          <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors duration-300">
                             {incident.title}
                           </h3>
                         </div>
-                        <p className="text-gray-300 mb-4 leading-relaxed">
+                        <p className="text-gray-600 mb-4 leading-relaxed">
                           {incident.description}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-4">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                           <div className="flex items-center space-x-2">
                             <span>📅</span>
                             <span>
@@ -623,7 +640,8 @@ function Dashboard() {
                         </div>
 
                         {incident.file && (
-                          <div className="inline-flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors duration-300 mb-4 cursor-pointer">
+                           // ✅ Changed: Link colors
+                          <div className="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-500 transition-colors duration-300 mb-4 cursor-pointer">
                             <span>📎</span>
                             <span className="underline">View Attachment</span>
                           </div>
@@ -634,7 +652,8 @@ function Dashboard() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {incident.type && (
-                          <span className="px-3 py-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-300 text-sm rounded-full border border-indigo-500/30">
+                          // ✅ Changed: Badge styles for better contrast
+                          <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full border border-indigo-200">
                             {incident.type}
                           </span>
                         )}
@@ -677,15 +696,17 @@ function Dashboard() {
             {/* ✨ Enhanced Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-8">
-                <div className="flex items-center space-x-2 bg-slate-800/50 p-2 rounded-xl border border-slate-700/30">
+                 {/* ✅ Changed: Pagination container */}
+                <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200">
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i}
                       onClick={() => setCurrentPage(i + 1)}
+                       // ✅ Changed: Pagination button styles
                       className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                         currentPage === i + 1
                           ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
-                          : "text-gray-400 hover:text-white hover:bg-slate-700"
+                          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                       }`}
                     >
                       {i + 1}
@@ -700,15 +721,17 @@ function Dashboard() {
 
       {/* ✨ Enhanced Profile Modal */}
       {showProfileModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-2xl shadow-2xl border border-slate-700/50 text-center max-w-md w-full mx-4 transform animate-scale-in">
+        // ✅ Changed: Modal overlay
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
+           {/* ✅ Changed: Modal body and text */}
+          <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-200 text-center max-w-md w-full mx-4 transform animate-scale-in">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-gray-700 bg-clip-text text-transparent">
                 Profile Picture
               </h2>
               <button
                 onClick={() => setShowProfileModal(false)}
-                className="w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center transition-colors duration-300"
+                className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors duration-300"
               >
                 ✕
               </button>
@@ -716,7 +739,8 @@ function Dashboard() {
 
             <div className="mb-8">
               <div className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-1 shadow-2xl">
-                <div className="w-full h-full rounded-2xl bg-slate-800 flex items-center justify-center text-4xl font-bold overflow-hidden">
+                 {/* ✅ Changed: Inner background */}
+                <div className="w-full h-full rounded-2xl bg-gray-100 flex items-center justify-center text-4xl font-bold overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img
                       src={userProfile.profilePic}
@@ -724,7 +748,7 @@ function Dashboard() {
                       className="w-full h-full object-cover rounded-2xl"
                     />
                   ) : (
-                    <span className="bg-gradient-to-br from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-br from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                       {username?.[0]?.toUpperCase() || "U"}
                     </span>
                   )}
@@ -736,7 +760,7 @@ function Dashboard() {
               <button
                 onClick={() => profilePicInputRef.current?.click()}
                 disabled={uploadingProfilePic}
-                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 disabled:hover:scale-100 flex items-center justify-center space-x-2"
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105 disabled:hover:scale-100 flex items-center justify-center space-x-2"
               >
                 {uploadingProfilePic ? (
                   <>
@@ -779,16 +803,17 @@ function Dashboard() {
 
       {/* ✨ Enhanced Delete Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 rounded-2xl shadow-2xl border border-slate-700/50 text-center max-w-md w-full mx-4 transform animate-scale-in">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
+           {/* ✅ Changed: Modal body and text */}
+          <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-200 text-center max-w-md w-full mx-4 transform animate-scale-in">
             <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl">⚠️</span>
             </div>
 
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">
               Confirm Deletion
             </h2>
-            <p className="text-gray-400 mb-8 leading-relaxed">
+            <p className="text-gray-600 mb-8 leading-relaxed">
               Are you sure you want to delete this incident? This action cannot
               be undone and all associated data will be permanently removed.
             </p>
@@ -803,7 +828,8 @@ function Dashboard() {
               </button>
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-105"
+                 // ✅ Changed: Cancel button style
+                className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-xl transition-all duration-300 hover:scale-105"
               >
                 Cancel
               </button>
@@ -841,23 +867,23 @@ function Dashboard() {
           animation: scale-in 0.3s ease-out;
         }
 
-        /* Custom scrollbar */
+        /* ✅ Changed: Custom scrollbar for light mode */
         ::-webkit-scrollbar {
           width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-          background: rgba(51, 65, 85, 0.3);
+          background: #e5e7eb; /* gray-200 */
           border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+          background: #9ca3af; /* gray-400 */
           border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #4f46e5, #7c3aed);
+          background: #6b7280; /* gray-500 */
         }
       `}</style>
     </div>
