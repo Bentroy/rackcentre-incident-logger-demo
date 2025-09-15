@@ -1,17 +1,32 @@
-// src/components/ProtectedRoute.jsx
 import { Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
-function ProtectedRoute({ children }) {
-  // Check if token exists in localStorage
+function ProtectedRoute({ children, adminOnly = false }) {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // If no token, redirect to login
     return <Navigate to="/login" replace />;
   }
 
-  // If token exists, render the page
-  return children;
+  try {
+    const decoded = jwtDecode(token);
+    
+    // Check if token is expired
+    if (decoded.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      return <Navigate to="/login" replace />;
+    }
+
+    // Check admin access if required
+    if (adminOnly && decoded.role !== 'admin') {
+      return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+  } catch (error) {
+    localStorage.removeItem("token");
+    return <Navigate to="/login" replace />;
+  }
 }
 
 export default ProtectedRoute;

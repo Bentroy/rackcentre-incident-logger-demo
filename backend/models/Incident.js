@@ -1,4 +1,3 @@
-// models/Incident.js
 const mongoose = require("mongoose");
 
 const IncidentSchema = new mongoose.Schema({
@@ -27,19 +26,17 @@ const IncidentSchema = new mongoose.Schema({
     type: Date, 
     default: Date.now 
   },
-  // ✅ Add user reference - each incident belongs to a user
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User', // Reference to User model
+    ref: 'User',
   },
-  // ✅ Store user info for quick access (optional but useful)
   userInfo: {
     name: String,
     email: String,
   }
 }, {
-  timestamps: true, // Adds createdAt and updatedAt automatically
+  timestamps: true,
 });
 
 module.exports = mongoose.model("Incident", IncidentSchema);

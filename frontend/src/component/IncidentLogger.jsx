@@ -272,19 +272,43 @@ function Dashboard() {
     <div className="flex h-screen bg-gray-100 text-gray-800 overflow-hidden">
       {/* ✨ Enhanced Collapsible Sidebar */}
       {/* ✅ Changed: Sidebar background to white */}
-      <aside className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 ease-in-out bg-white shadow-lg border-r border-gray-200 flex flex-col relative`}>
+      <aside
+        className={`${
+          sidebarCollapsed ? "w-20" : "w-80"
+        } transition-all duration-300 ease-in-out bg-white shadow-lg border-r border-gray-200 flex flex-col relative`}
+      >
         {/* Collapse Button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="absolute -right-3 top-8 w-6 h-6 bg-white border border-gray-300 rounded-full shadow-md flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-all duration-200 z-10"
         >
           {sidebarCollapsed ? (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           ) : (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           )}
         </button>
@@ -295,8 +319,18 @@ function Dashboard() {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <div>
@@ -308,23 +342,31 @@ function Dashboard() {
         )}
 
         {/* Profile Section */}
-        <div className={`${sidebarCollapsed ? 'p-4 pt-16' : 'p-6'}`}>
+        <div className={`${sidebarCollapsed ? "p-4 pt-16" : "p-6"}`}>
           <div className="flex flex-col items-center">
-            <div 
+            <div
               className="relative group cursor-pointer"
               onClick={() => !sidebarCollapsed && setShowProfileModal(true)}
             >
-              <div className={`${sidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5 shadow-lg hover:shadow-xl transition-all duration-200`}>
+              <div
+                className={`${
+                  sidebarCollapsed ? "w-12 h-12" : "w-16 h-16"
+                } rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5 shadow-lg hover:shadow-xl transition-all duration-200`}
+              >
                 {/* ✅ Changed: Inner background to light gray for contrast */}
                 <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                   {userProfile?.profilePic ? (
-                    <img 
-                      src={`http://localhost:5000${userProfile.profilePic}`} 
-                      alt="Profile" 
+                    <img
+                      src={`http://localhost:5000${userProfile.profilePic}`}
+                      alt="Profile"
                       className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
-                    <span className={`font-bold text-gray-600 ${sidebarCollapsed ? 'text-lg' : 'text-xl'}`}>
+                    <span
+                      className={`font-bold text-gray-600 ${
+                        sidebarCollapsed ? "text-lg" : "text-xl"
+                      }`}
+                    >
                       {username?.[0]?.toUpperCase() || "U"}
                     </span>
                   )}
@@ -334,8 +376,16 @@ function Dashboard() {
                 // ✅ Changed: Border color to match new background
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white">
                   <div className="w-full h-full rounded-full bg-green-500 flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -348,7 +398,9 @@ function Dashboard() {
                 <h3 className="font-semibold text-gray-800">
                   {userProfile?.name || username}
                 </h3>
-                <p className="text-sm text-gray-500 mb-2">{userProfile?.email}</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  {userProfile?.email}
+                </p>
                 <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
                   {incidents.length} Reports
@@ -359,15 +411,29 @@ function Dashboard() {
         </div>
 
         {/* Navigation Menu */}
-        <div className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-6'}`}>
+        <div className={`flex-1 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
           <nav className="space-y-2">
             {/* ✅ Changed: Text colors for light mode */}
             <button
               onClick={scrollToIncidents}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200 group text-gray-600 font-medium`}
+              className={`w-full flex items-center ${
+                sidebarCollapsed ? "justify-center py-3" : "px-4 py-3"
+              } rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200 group text-gray-600 font-medium`}
             >
-              <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'} group-hover:scale-110 transition-transform duration-200`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <svg
+                className={`${
+                  sidebarCollapsed ? "w-5 h-5" : "w-5 h-5 mr-3"
+                } group-hover:scale-110 transition-transform duration-200`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
               {!sidebarCollapsed && (
                 <div className="flex-1 text-left">
@@ -379,10 +445,24 @@ function Dashboard() {
 
             <button
               onClick={() => fetchIncidents()}
-              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-200 group text-gray-600 font-medium`}
+              className={`w-full flex items-center ${
+                sidebarCollapsed ? "justify-center py-3" : "px-4 py-3"
+              } rounded-lg hover:bg-gray-100 hover:text-green-600 transition-colors duration-200 group text-gray-600 font-medium`}
             >
-              <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'} group-hover:rotate-180 transition-transform duration-300`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <svg
+                className={`${
+                  sidebarCollapsed ? "w-5 h-5" : "w-5 h-5 mr-3"
+                } group-hover:rotate-180 transition-transform duration-300`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
               {!sidebarCollapsed && (
                 <div className="flex-1 text-left">
@@ -392,14 +472,45 @@ function Dashboard() {
               )}
             </button>
           </nav>
+          {/* // Add this after your "Refresh Data" button: */}
+          {userProfile?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition-colors duration-200 group text-gray-700 font-medium"
+            >
+              <svg
+                className="w-5 h-5 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <div className="flex-1 text-left">
+                <div className="text-sm font-medium">Admin Panel</div>
+                <div className="text-xs text-gray-500">System overview</div>
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Bottom Section */}
         {/* ✅ Changed: Border color */}
-        <div className={`border-t border-gray-200 ${sidebarCollapsed ? 'p-2' : 'p-6'} space-y-4`}>
+        <div
+          className={`border-t border-gray-200 ${
+            sidebarCollapsed ? "p-2" : "p-6"
+          } space-y-4`}
+        >
           {!sidebarCollapsed && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500 font-medium">HSE Incident Logger</span>
+              <span className="text-gray-500 font-medium">
+                HSE Incident Logger
+              </span>
               <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
                 BETA
               </span>
@@ -408,10 +519,22 @@ function Dashboard() {
 
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center py-3' : 'px-4 py-3'} rounded-lg bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 transition-colors duration-200 font-medium`}
+            className={`w-full flex items-center ${
+              sidebarCollapsed ? "justify-center py-3" : "px-4 py-3"
+            } rounded-lg bg-red-100 hover:bg-red-200 text-red-700 hover:text-red-800 transition-colors duration-200 font-medium`}
           >
-            <svg className={`${sidebarCollapsed ? 'w-5 h-5' : 'w-5 h-5 mr-3'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg
+              className={`${sidebarCollapsed ? "w-5 h-5" : "w-5 h-5 mr-3"}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
             {!sidebarCollapsed && <span>Sign Out</span>}
           </button>
@@ -428,11 +551,18 @@ function Dashboard() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 via-indigo-700 to-indigo-500 bg-clip-text text-transparent">
                 HSE Incident Logger
               </h1>
-              <p className="text-gray-500 mt-1">Personal incident tracking & reporting</p>
+              <p className="text-gray-500 mt-1">
+                Personal incident tracking & reporting
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="px-4 py-2 bg-gray-100 rounded-xl border border-gray-200">
-                <span className="text-sm text-gray-600">Welcome back, <span className="font-semibold text-slate-800">{username}</span></span>
+                <span className="text-sm text-gray-600">
+                  Welcome back,{" "}
+                  <span className="font-semibold text-slate-800">
+                    {username}
+                  </span>
+                </span>
               </div>
             </div>
           </div>
@@ -518,7 +648,7 @@ function Dashboard() {
                 className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
                 required
               />
-              
+
               {/* ✅ Changed: File input background */}
               <div className="relative">
                 <input
@@ -613,7 +743,7 @@ function Dashboard() {
                           <span className="text-2xl">
                             {typeIcons[incident.type] || "📝"}
                           </span>
-                           {/* ✅ Changed: Text colors */}
+                          {/* ✅ Changed: Text colors */}
                           <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors duration-300">
                             {incident.title}
                           </h3>
@@ -640,7 +770,7 @@ function Dashboard() {
                         </div>
 
                         {incident.file && (
-                           // ✅ Changed: Link colors
+                          // ✅ Changed: Link colors
                           <div className="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-500 transition-colors duration-300 mb-4 cursor-pointer">
                             <span>📎</span>
                             <span className="underline">View Attachment</span>
@@ -696,13 +826,13 @@ function Dashboard() {
             {/* ✨ Enhanced Pagination */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-8">
-                 {/* ✅ Changed: Pagination container */}
+                {/* ✅ Changed: Pagination container */}
                 <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200">
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i}
                       onClick={() => setCurrentPage(i + 1)}
-                       // ✅ Changed: Pagination button styles
+                      // ✅ Changed: Pagination button styles
                       className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                         currentPage === i + 1
                           ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
@@ -723,7 +853,7 @@ function Dashboard() {
       {showProfileModal && (
         // ✅ Changed: Modal overlay
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
-           {/* ✅ Changed: Modal body and text */}
+          {/* ✅ Changed: Modal body and text */}
           <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-200 text-center max-w-md w-full mx-4 transform animate-scale-in">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-gray-700 bg-clip-text text-transparent">
@@ -739,7 +869,7 @@ function Dashboard() {
 
             <div className="mb-8">
               <div className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-1 shadow-2xl">
-                 {/* ✅ Changed: Inner background */}
+                {/* ✅ Changed: Inner background */}
                 <div className="w-full h-full rounded-2xl bg-gray-100 flex items-center justify-center text-4xl font-bold overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img
@@ -804,7 +934,7 @@ function Dashboard() {
       {/* ✨ Enhanced Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center animate-fade-in z-50">
-           {/* ✅ Changed: Modal body and text */}
+          {/* ✅ Changed: Modal body and text */}
           <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-200 text-center max-w-md w-full mx-4 transform animate-scale-in">
             <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl">⚠️</span>
@@ -828,7 +958,7 @@ function Dashboard() {
               </button>
               <button
                 onClick={() => setShowDeleteModal(false)}
-                 // ✅ Changed: Cancel button style
+                // ✅ Changed: Cancel button style
                 className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-xl transition-all duration-300 hover:scale-105"
               >
                 Cancel

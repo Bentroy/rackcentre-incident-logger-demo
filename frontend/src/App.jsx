@@ -2,10 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./component/Login";
 import Register from "./component/Register";
 import IncidentLogger from "./component/IncidentLogger";
+import AdminDashboard from "./component/AdminDashboard";
 import ProtectedRoute from "./component/ProtectedRoute";
-import NotFound from "./component/NotFound"; // 👈 Import
-
-
+import NotFound from "./component/NotFound";
 
 function App() {
   return (
@@ -15,14 +14,21 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/IncidentLogger"   // 👈 Keep exact casing here
+          path="/IncidentLogger"
           element={
             <ProtectedRoute>
               <IncidentLogger />
             </ProtectedRoute>
           }
         />
-        {/* 👇 Catch all unmatched routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

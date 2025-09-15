@@ -1,31 +1,23 @@
-// controllers/authController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if all fields exist
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -37,7 +29,8 @@ const registerUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id, user.name), // ✅ Include name in token
+        role: user.role,
+        token: generateToken(user.id, user.name, user.role),
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -48,14 +41,10 @@ const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email
     const user = await User.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -63,10 +52,12 @@ const loginUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id, user.name), // ✅ Include name in token
-        user: { // ✅ Return user object for frontend
+        role: user.role,
+        token: generateToken(user.id, user.name, user.role),
+        user: {
           name: user.name,
-          email: user.email
+          email: user.email,
+          role: user.role
         }
       });
     } else {
@@ -78,11 +69,11 @@ const loginUser = async (req, res) => {
   }
 };
 
-// ✅ Generate JWT with user ID and username
-const generateToken = (id, username) => {
+const generateToken = (id, username, role) => {
   return jwt.sign({ 
     id, 
-    username 
+    username,
+    role
   }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
