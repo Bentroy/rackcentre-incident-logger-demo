@@ -4,10 +4,9 @@ const { protect, adminOnly } = require("../middleware/authMiddleware");
 const {
   getAllIncidents,
   getIncidentStats,
-  getAllUsers,
-  deleteIncident,
-  exportIncidents
+  getAllUsers
 } = require("../controllers/adminController");
+const { adminDeleteIncident } = require("../controllers/incidentController");
 
 const router = express.Router();
 
@@ -15,7 +14,6 @@ const router = express.Router();
 router.get("/incidents", protect, adminOnly, getAllIncidents);
 router.get("/stats", protect, adminOnly, getIncidentStats);
 router.get("/users", protect, adminOnly, getAllUsers);
-router.delete("/incidents/:id", protect, adminOnly, deleteIncident);
-router.get("/export", protect, adminOnly, exportIncidents);
+router.delete("/incidents/:id", protect, adminOnly, adminDeleteIncident);
 
 module.exports = router;

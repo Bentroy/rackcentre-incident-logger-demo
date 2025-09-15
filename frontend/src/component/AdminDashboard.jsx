@@ -45,7 +45,7 @@ function AdminDashboard() {
     navigate("/login");
   }, [navigate]);
 
-  // Fetch all incidents from an admin-specific endpoint
+  // Replace the fetchAllIncidents function with:
   useEffect(() => {
     const fetchAllIncidents = async () => {
       const token = localStorage.getItem("token");
@@ -61,23 +61,37 @@ function AdminDashboard() {
           return;
         }
 
-        // IMPORTANT: Assuming the token contains role info.
-        // Your backend should robustly protect this endpoint.
+        // Check admin role
         if (decoded.role !== "admin") {
           alert("Access denied. You are not an administrator.");
-          navigate("/dashboard"); // Redirect non-admins
+          navigate("/IncidentLogger");
           return;
         }
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        // Assumes an endpoint that returns all incidents with user data populated
-        const res = await axios.get("http://localhost:5000/api/incidents/all");
-        setAllIncidents(res.data);
+        // Use the admin API endpoint
+        const res = await axios.get(
+          "http://localhost:5000/api/admin/incidents"
+        );
+        setAllIncidents(res.data.incidents || res.data);
+
+        // Also fetch stats if available
+        try {
+          // eslint-disable-next-line no-unused-vars
+          const statsRes = await axios.get(
+            "http://localhost:5000/api/admin/stats"
+          );
+          // Handle stats response
+        // eslint-disable-next-line no-unused-vars
+        } catch (statsError) {
+          console.log("Stats not available yet");
+        }
       } catch (error) {
         console.error("Error fetching all incidents:", error);
         if (error.response?.status === 401 || error.response?.status === 403) {
-          handleLogout();
+          alert("Access denied. Admin privileges required.");
+          navigate("/IncidentLogger");
         }
       } finally {
         setLoading(false);

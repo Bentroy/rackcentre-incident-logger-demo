@@ -6,24 +6,28 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const incidentRoutes = require("./routes/incidentRoutes");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes"); // Add this line
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes); // Add this line
 
 app.get("/", (req, res) => {
   res.send("HSE Incident Logger API is running...");

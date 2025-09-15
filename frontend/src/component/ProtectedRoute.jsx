@@ -19,10 +19,12 @@ function ProtectedRoute({ children, adminOnly = false }) {
 
     // Check admin access if required
     if (adminOnly && decoded.role !== 'admin') {
-      return <Navigate to="/dashboard" replace />;
+      // Redirect to IncidentLogger instead of /dashboard
+      return <Navigate to="/IncidentLogger" replace />;
     }
 
     return children;
+  // eslint-disable-next-line no-unused-vars
   } catch (error) {
     localStorage.removeItem("token");
     return <Navigate to="/login" replace />;

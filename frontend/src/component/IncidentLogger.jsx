@@ -10,7 +10,6 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
     description: "",
     date: "",
     type: "",
@@ -67,6 +66,16 @@ function Dashboard() {
   }, [handleLogout]);
 
   useEffect(() => {
+    const handlePopState = () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -90,6 +99,9 @@ function Dashboard() {
     } else {
       navigate("/login");
     }
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
   }, [navigate, fetchUserProfile, fetchIncidents, handleLogout]);
 
   const handleProfilePicUpload = async (event) => {
@@ -157,7 +169,6 @@ function Dashboard() {
 
     try {
       const data = new FormData();
-      data.append("title", formData.title);
       data.append("description", formData.description);
       data.append("date", formData.date);
       data.append("type", formData.type);
@@ -188,7 +199,6 @@ function Dashboard() {
       }
 
       setFormData({
-        title: "",
         description: "",
         date: "",
         type: "",
@@ -473,7 +483,7 @@ function Dashboard() {
             </button>
           </nav>
           {/* // Add this after your "Refresh Data" button: */}
-          {userProfile?.role === "admin" && (
+          {!sidebarCollapsed && userProfile?.role === "admin" && (
             <button
               onClick={() => navigate("/admin")}
               className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition-colors duration-200 group text-gray-700 font-medium"
@@ -495,6 +505,26 @@ function Dashboard() {
                 <div className="text-sm font-medium">Admin Panel</div>
                 <div className="text-xs text-gray-500">System overview</div>
               </div>
+            </button>
+          )}
+          {sidebarCollapsed && userProfile?.role === "admin" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full flex items-center justify-center py-3 rounded-lg hover:bg-purple-50 hover:text-purple-700 transition-colors duration-200 group text-gray-700 font-medium"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
             </button>
           )}
         </div>
@@ -589,15 +619,6 @@ function Dashboard() {
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* ✅ Changed: Input field styles */}
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Incident Title"
-                className="col-span-full h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500 transition-all duration-300 hover:bg-gray-100"
-                required
-              />
 
               <select
                 name="type"
@@ -640,32 +661,39 @@ function Dashboard() {
             />
 
             <div className="grid md:grid-cols-2 gap-6">
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
-                required
-              />
-
-              {/* ✅ Changed: File input background */}
-              <div className="relative">
+              <div className="flex flex-col">
+                <p className="text-sm text-gray-500">Date of Occurrence</p>
                 <input
-                  type="file"
-                  name="file"
-                  id="fileInput"
-                  onChange={(e) =>
-                    setFormData({ ...formData, file: e.target.files[0] })
-                  }
-                  accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt"
-                  className="w-full h-14 bg-gray-50 border border-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 text-transparent
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  placeholder="Detailed description of the incident..."
+                  className="h-14 p-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 hover:bg-gray-100"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <p className="text-sm text-gray-500">File Upload</p>
+                {/* ✅ Changed: File input background */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    name="file"
+                    id="fileInput"
+                    onChange={(e) =>
+                      setFormData({ ...formData, file: e.target.files[0] })
+                    }
+                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt"
+                    className="w-full h-14 bg-gray-50 border border-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-100 text-transparent
                     file:absolute file:left-4 file:top-1/2 file:-translate-y-1/2
                     file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold 
                     file:bg-gradient-to-r file:from-indigo-500 file:to-purple-600 file:text-white 
                     hover:file:from-indigo-600 hover:file:to-purple-700 file:transition-all file:duration-300
                     cursor-pointer"
-                />
+                  />
+                </div>
               </div>
             </div>
 

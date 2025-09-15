@@ -36,7 +36,6 @@ exports.getAllIncidentsAdmin = async (req, res) => {
 exports.createIncident = async (req, res) => {
   try {
     const incident = new Incident({
-      title: req.body.title,
       description: req.body.description,
       date: req.body.date,
       type: req.body.type,
@@ -74,7 +73,6 @@ exports.updateIncident = async (req, res) => {
     }
 
     const updateData = {
-      title: req.body.title,
       description: req.body.description,
       date: req.body.date,
       type: req.body.type,
