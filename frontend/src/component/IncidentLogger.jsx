@@ -14,6 +14,7 @@ function Dashboard() {
     date: "",
     type: "",
     impact: "",
+    location: "", 
     file: null,
   });
   const [editingIndex, setEditingIndex] = useState(null);
