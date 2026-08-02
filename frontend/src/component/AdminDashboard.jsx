@@ -72,7 +72,7 @@ function AdminDashboard() {
 
         // Use the admin API endpoint
         const res = await axios.get(
-          "http://localhost:5000/api/admin/incidents"
+          `${import.meta.env.VITE_API_URL}/api/admin/incidents`
         );
         setAllIncidents(res.data.incidents || res.data);
 
@@ -80,7 +80,7 @@ function AdminDashboard() {
         try {
           // eslint-disable-next-line no-unused-vars
           const statsRes = await axios.get(
-            "http://localhost:5000/api/admin/stats"
+            `${import.meta.env.VITE_API_URL}/api/admin/stats`
           );
           // Handle stats response
         // eslint-disable-next-line no-unused-vars

@@ -14,7 +14,7 @@ function Dashboard() {
     date: "",
     type: "",
     impact: "",
-    location: "", 
+    location: "",
     file: null,
   });
   const [editingIndex, setEditingIndex] = useState(null);
@@ -41,7 +41,9 @@ function Dashboard() {
 
   const fetchUserProfile = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users/profile");
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/users/profile`,
+      );
       setUserProfile(res.data);
     } catch (error) {
       console.error("Error fetching user profile:", error);
@@ -54,7 +56,7 @@ function Dashboard() {
   const fetchIncidents = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/incidents");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/incidents`);
       setIncidents(res.data);
     } catch (error) {
       console.error("Error fetching incidents:", error);
@@ -126,11 +128,11 @@ function Dashboard() {
       formData.append("profilePic", file);
 
       const res = await axios.put(
-        "http://localhost:5000/api/users/profile-pic",
+        `${import.meta.env.VITE_API_URL}/api/users/profile-pic`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       setUserProfile(res.data.user);
@@ -146,7 +148,7 @@ function Dashboard() {
   const handleRemoveProfilePic = async () => {
     try {
       const res = await axios.delete(
-        "http://localhost:5000/api/users/profile-pic"
+        `${import.meta.env.VITE_API_URL}/api/users/profile-pic`,
       );
       setUserProfile(res.data.user);
       setShowProfileModal(false);
@@ -183,9 +185,9 @@ function Dashboard() {
       if (editingIndex !== null) {
         const incidentId = incidents[editingIndex]._id;
         res = await axios.put(
-          `http://localhost:5000/api/incidents/${incidentId}`,
+          `${import.meta.env.VITE_API_URL}/api/incidents/${incidentId}`,
           data,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
 
         const updatedIncidents = [...incidents];
@@ -193,7 +195,7 @@ function Dashboard() {
         setIncidents(updatedIncidents);
         setEditingIndex(null);
       } else {
-        res = await axios.post("http://localhost:5000/api/incidents", data, {
+        res = await axios.post(`${import.meta.env.VITE_API_URL}/api/incidents`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setIncidents([res.data, ...incidents]);
@@ -229,7 +231,7 @@ function Dashboard() {
   const handleDelete = async () => {
     try {
       const incidentId = incidents[deleteIndex]._id;
-      await axios.delete(`http://localhost:5000/api/incidents/${incidentId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/incidents/${incidentId}`);
 
       const updatedIncidents = incidents.filter((_, i) => i !== deleteIndex);
       setIncidents(updatedIncidents);
@@ -368,7 +370,7 @@ function Dashboard() {
                 <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                   {userProfile?.profilePic ? (
                     <img
-                      src={`http://localhost:5000${userProfile.profilePic}`}
+                      src={`${import.meta.env.VITE_API_URL}${userProfile.profilePic}`}
                       alt="Profile"
                       className="w-full h-full object-cover rounded-full"
                     />
@@ -792,7 +794,7 @@ function Dashboard() {
                             <span>⏰</span>
                             <span>
                               {new Date(
-                                incident.createdAt || incident.timestamp
+                                incident.createdAt || incident.timestamp,
                               ).toLocaleString()}
                             </span>
                           </div>
