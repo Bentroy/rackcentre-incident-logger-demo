@@ -72,6 +72,19 @@ npm run dev
 ```
 
 ---
+## 📸 Screenshots
+
+### Login
+
+![](screenshots/login.png)
+
+### Dashboard
+
+![](screenshots/dashboard.png)
+
+### Incident Form
+
+![](screenshots/incident-form.png)
 
 ## 👨‍💻 Author
 
