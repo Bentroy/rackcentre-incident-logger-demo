@@ -76,15 +76,23 @@ npm run dev
 
 ### Login
 
-![](screenshots/login.png)
+![](screenshots/LOGIN.png)
+
+### REGISTER
+
+![](screenshots/REGISTER.png)
 
 ### Dashboard
 
-![](screenshots/dashboard.png)
+![](screenshots/ADMIN-DASHBOARD.png)
 
 ### Incident Form
 
-![](screenshots/incident-form.png)
+![](screenshots/INCIDENT-FORM.png)
+
+### Incident List
+
+![](screenshots/INCIDENT-LIST.png)
 
 ## 👨‍💻 Author
 
